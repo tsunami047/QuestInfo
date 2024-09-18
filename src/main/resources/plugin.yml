@@ -1,0 +1,15 @@
+name: QuestInfo
+version: '1.0'
+main: com.killercraft.jimy.questinfo.QuestInfo
+commands:
+  qinfo:
+depend:
+  - GermPlugin
+  - Chemdah
+  - Adyeshach
+  - MythicMobs
+  - AoitoriProject
+  - DailyQuest
+softdepend:
+  - PlaceholderAPI
+  - SX-Item

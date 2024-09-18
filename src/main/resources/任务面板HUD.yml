@@ -1,0 +1,410 @@
+任务信息hud:
+  options:
+    startX: "w-134-5"
+    startY: "(h-161)*0.53"
+    startZ: "100"
+    guide: false
+    dragSwallow: false
+    openDos:
+    - "putPlaceholder<->任务显示百分比@0"
+    - 'delay<->500'
+    - "putPlaceholder<->任务显示总时间@700"
+    - "putPlaceholder<->任务显示开始时间@%time_now%"
+    - "putPlaceholder<->任务显示当前时间@0"
+    - "putPlaceholder<->任务显示剩余时间@0"
+    - 'mark<->计算'
+    - "calPlaceholder<->任务显示当前时间@%time_now%-%任务显示开始时间%"
+    - 'delay<->1'
+    - "calPlaceholder<->任务显示百分比@min(lerp(0,100,%任务显示当前时间%/%任务显示总时间%),100)"
+    - "calPlaceholder<->任务显示剩余时间@max(ceil((%任务显示总时间%-%任务显示当前时间%)/100)/10,0)"
+    - "condition<->%任务显示当前时间%<=%任务显示总时间%@[计算]@[完成]"
+    - 'mark<->打断'
+    - 'goto<->关闭'
+    - 'mark<->完成'
+    - 'mark<->关闭'
+    
+    drag:
+      #可拖动区域的坐标
+      locationX: "0"
+      locationY: "0"
+      #可拖动区域的宽度
+      width: "271/2"
+      #可拖动区域的高度
+      height: "35/2"
+    variables: |
+      {
+        HUD显示: 1,
+        界面比例: 1
+      }
+    script:
+      openScript: |
+      tickScript: |
+        if( tickCount % 20 != 0){
+          return 0;
+        }
+        var jsw = PAPI.parse("%calculate_607/w%");
+        var jsh = PAPI.parse("%calculate_66/h%");
+        if (jsw > 1 || jsh > 1) {
+            GuiOptions.setVariable("界面比例","0.5");
+        }else{
+            GuiOptions.setVariable("界面比例","1");
+        }
+  #背景图
+  background:
+    type: 0
+    path: textures/gui/任务/Sprite0111.png
+    locationX: "0"
+    locationY: "0"
+    width: "271/2*{{界面比例}}"
+    height: "275/2*{{界面比例}}"
+    # animations:
+    # - "任务HUD显示从右往左"
+  background2:
+    type: 0
+    path: textures/gui/任务/Sprite0112.png
+    locationX: "0"
+    locationY: "31/2*{{界面比例}}"
+    width: "271/2*{{界面比例}}"
+    height: "(17/2)*{{界面比例}}+((244-17)/2)*%任务显示百分比%/100*{{界面比例}}"
+    startU: '0'
+    startV: '(244-17)-(244-17)*%任务显示百分比%/100'
+    endU: "271"
+    endV: "244"
+    # animations:
+    # - "任务HUD显示从右往左"
+  状态按钮:
+    type: 3
+    defaultPath: textures/gui/任务/Sprite-0004.png
+    hoverPath: textures/gui/任务/Sprite-0006.png
+    clickSound: 'minecraft:ui.button.click'
+    locationX: "248/2*{{界面比例}}"
+    locationY: "12/2*{{界面比例}}"
+    locationZ: "500"
+    width: "17*{{界面比例}}/2"
+    height: "17*{{界面比例}}/2"
+    swallow: true
+    interactCooldown: 1000
+    # animations:
+    # - "任务HUD显示从右往左"
+    tooltip:
+      - '&f点击 &c收起 &f任务信息栏'
+    clickScript: |-
+      #pragma jexl.import java.util
+      var kg = GuiOptions.getVariable("HUD显示");
+      var ztanniu = GuiScreen.getGuiPart("状态按钮");
+      var scoll = GuiScreen.getGuiPart("任务hud列表_scroll");
+      scoll.setScrolledV("0");
+      var listUtils = Utils.forClass('com.google.common.collect.Lists');
+      var alist = listUtils.newArrayList();
+      var dos = listUtils.newArrayList();
+      if(kg == 1){
+        GuiOptions.setVariable("HUD显示","0");
+        ztanniu.setDefaultPath("textures/gui/任务/Sprite-0003.png");
+        ztanniu.setHoverPath("textures/gui/任务/Sprite-0005.png");
+        alist.add(str("&f点击 &a显示 &f任务信息栏"));
+        ztanniu.setTooltip(alist);
+        dos.add("putPlaceholder<->任务显示总时间@300");
+        dos.add("putPlaceholder<->任务显示开始时间@%time_now%");
+        dos.add("putPlaceholder<->任务显示当前时间@0");
+        dos.add("mark<->计算");
+        dos.add("calPlaceholder<->任务显示当前时间@%time_now%-%任务显示开始时间%");
+        dos.add("delay<->1");
+        dos.add("calPlaceholder<->任务显示百分比@max(lerp(100,0,%任务显示当前时间%/%任务显示总时间%),0)");
+        dos.add("condition<->%任务显示当前时间%<=%任务显示总时间%@[计算]@[完成]");
+        dos.add("mark<->打断");
+        dos.add("goto<->关闭");
+        dos.add("mark<->完成");
+        dos.add("mark<->关闭");
+        GuiProxy.analyzeDos(dos);
+      }else{
+        GuiOptions.setVariable("HUD显示","1");
+        ztanniu.setDefaultPath("textures/gui/任务/Sprite-0004.png");
+        ztanniu.setHoverPath("textures/gui/任务/Sprite-0006.png");
+        alist.add(str("&f点击 &c收起 &f任务信息栏"));
+        ztanniu.setTooltip(alist);
+        dos.add("putPlaceholder<->任务显示总时间@700");
+        dos.add("putPlaceholder<->任务显示开始时间@%time_now%");
+        dos.add("putPlaceholder<->任务显示当前时间@0");
+        dos.add("mark<->计算");
+        dos.add("calPlaceholder<->任务显示当前时间@%time_now%-%任务显示开始时间%");
+        dos.add("delay<->1");
+        dos.add("calPlaceholder<->任务显示百分比@min(lerp(0,100,%任务显示当前时间%/%任务显示总时间%),100)");
+        dos.add("condition<->%任务显示当前时间%<=%任务显示总时间%@[计算]@[完成]");
+        dos.add("mark<->完成");
+        dos.add("mark<->关闭");
+        GuiProxy.analyzeDos(dos);
+      }
+  任务hud列表_scroll:
+    type: 8
+    enable: '%任务显示百分比%>0'
+    locationX: '6/2*{{界面比例}}'
+    locationY: '31/2*{{界面比例}}'
+    width: '259/2*{{界面比例}}'
+    height: '227/2*{{界面比例}}*%任务显示百分比%/100'
+    locationVX: '(259/2-1.5)*{{界面比例}}'
+    locationVY: '1*{{界面比例}}'
+    widthV: '0'
+    heightV: '(227/2-10)*{{界面比例}}'
+    relative: true
+    #scrollableV: '%thisGui_list_scroll$info_height%'
+    scrollableV: 'auto+50'
+    scrolledV: '0'
+    invalidV: false
+    sliderV:
+      type: 3
+      defaultPath: 'textures/gui/任务/Sprite-0006dh.png'
+      hoverColor: 0xFFAAAAAA
+      width: "9/2*{{界面比例}}"
+      height: "16/2*{{界面比例}}"
+    layout:
+      type: FLOW
+      gapX: "0"
+      gapY: "5"
+    scrollableParts:
+      模板:
+        type: canvas
+        enable: 'true'
+        locationX: "1/2*{{界面比例}}"
+        locationY: "1/2*{{界面比例}}"
+        locationZ: "0"
+        width: "234/2*{{界面比例}}"
+        height: "(%thisGui_thisPart$背景_height%+%thisGui_thisPart$任务内容_size%*9)"
+        relativeParts: 
+          背景:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0024.png
+            width: "234/2*{{界面比例}}"
+            height: "28/2*{{界面比例}}"
+            locationX: "14/2*{{界面比例}}"
+            locationY: "3/2*{{界面比例}}"
+          任务类型:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0020.png
+            width: "34/2*{{界面比例}}"
+            height: "34/2*{{界面比例}}"
+            locationX: "0"
+            locationY: "0"
+            tooltip:
+              - '&7主线任务'
+          任务名:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - "&a逆天改命"
+            locationX: "(34/2)*{{界面比例}}"
+            locationY: "4.5*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+          导航按钮:
+            type: 3
+            defaultPath: textures/gui/任务/Sprite-004.png
+            hoverPath: textures/gui/任务/Sprite-004.png
+            clickSound: 'minecraft:ui.button.click'
+            locationX: "(234/2-24)*{{界面比例}}"
+            locationY: "5*{{界面比例}}"
+            width: "58*{{界面比例}}/2"
+            height: "15*{{界面比例}}/2"
+            tooltip:
+              - '&7关闭追踪窗口'
+          任务内容:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - " &a● &f前往 &2诺兰城"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+              
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+            locationX: "0*{{界面比例}}"
+            locationY: "17*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+      模板1:
+        type: canvas
+        enable: 'true'
+        locationX: "1/2*{{界面比例}}"
+        locationY: "1/2*{{界面比例}}"
+        locationZ: "0"
+        width: "234/2*{{界面比例}}"
+        height: "(%thisGui_thisPart$背景_height%+%thisGui_thisPart$任务内容_size%*9)"
+        relativeParts: 
+          背景:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0030.png
+            width: "234/2*{{界面比例}}"
+            height: "28/2*{{界面比例}}"
+            locationX: "14/2*{{界面比例}}"
+            locationY: "3/2*{{界面比例}}"
+          任务类型:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0023.png
+            width: "34/2*{{界面比例}}"
+            height: "34/2*{{界面比例}}"
+            locationX: "0"
+            locationY: "0"
+          任务名:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - "&a重生之我在奈落打工"
+            locationX: "(34/2)*{{界面比例}}"
+            locationY: "4.5*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+          导航按钮:
+            type: 3
+            defaultPath: textures/gui/任务/Sprite-005.png
+            hoverPath: textures/gui/任务/Sprite-005.png
+            clickSound: 'minecraft:ui.button.click'
+            locationX: "(234/2-24)*{{界面比例}}"
+            locationY: "5*{{界面比例}}"
+            width: "58*{{界面比例}}/2"
+            height: "15*{{界面比例}}/2"
+            tooltip:
+              - '&7关闭追踪窗口'
+          任务内容:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - " &a● &f前往 &2诺兰城"
+              - " &a● &f交互 &f卡瑟斯&7[&aNPC&7] &f进行对话"
+              - " &a● &f根据 &c导航 &f达到任务目的地"
+            locationX: "0*{{界面比例}}"
+            locationY: "17*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+      模板2:
+        type: canvas
+        enable: 'true'
+        locationX: "1/2*{{界面比例}}"
+        locationY: "1/2*{{界面比例}}"
+        locationZ: "0"
+        width: "234/2*{{界面比例}}"
+        height: "(%thisGui_thisPart$背景_height%+%thisGui_thisPart$任务内容_size%*9)"
+        relativeParts: 
+          背景:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0026.png
+            width: "234/2*{{界面比例}}"
+            height: "28/2*{{界面比例}}"
+            locationX: "14/2*{{界面比例}}"
+            locationY: "3/2*{{界面比例}}"
+          任务类型:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0021.png
+            width: "34/2*{{界面比例}}"
+            height: "34/2*{{界面比例}}"
+            locationX: "0"
+            locationY: "0"
+          任务名:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - "&a重生之我在奈落打工"
+            locationX: "(34/2)*{{界面比例}}"
+            locationY: "4.5*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+          导航按钮:
+            type: 3
+            defaultPath: textures/gui/任务/Sprite-005.png
+            hoverPath: textures/gui/任务/Sprite-005.png
+            clickSound: 'minecraft:ui.button.click'
+            locationX: "(234/2-24)*{{界面比例}}"
+            locationY: "5*{{界面比例}}"
+            width: "58*{{界面比例}}/2"
+            height: "15*{{界面比例}}/2"
+            tooltip:
+              - '&7关闭追踪窗口'
+          任务内容:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - " &a● &f前往 &2诺兰城"
+              - " &a● &f通关 &c哥布林洞穴&8[&a简单&8] &7(&f1&7/&b3&7)"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+            locationX: "0*{{界面比例}}"
+            locationY: "17*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+      模板3:
+        type: canvas
+        enable: 'true'
+        locationX: "1/2*{{界面比例}}"
+        locationY: "1/2*{{界面比例}}"
+        locationZ: "0"
+        width: "234/2*{{界面比例}}"
+        height: "(%thisGui_thisPart$背景_height%+%thisGui_thisPart$任务内容_size%*9)"
+        relativeParts: 
+          背景:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0032.png
+            width: "234/2*{{界面比例}}"
+            height: "28/2*{{界面比例}}"
+            locationX: "14/2*{{界面比例}}"
+            locationY: "3/2*{{界面比例}}"
+          任务类型:
+            type: texture
+            enable: 'true'
+            path: textures/gui/任务/Sprite-0022.png
+            width: "34/2*{{界面比例}}"
+            height: "34/2*{{界面比例}}"
+            locationX: "0"
+            locationY: "0"
+          任务名:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - "&a重生之我在奈落打工"
+            locationX: "(34/2)*{{界面比例}}"
+            locationY: "4.5*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648
+          导航按钮:
+            type: 3
+            defaultPath: textures/gui/任务/Sprite-005.png
+            hoverPath: textures/gui/任务/Sprite-005.png
+            clickSound: 'minecraft:ui.button.click'
+            locationX: "(234/2-24)*{{界面比例}}"
+            locationY: "5*{{界面比例}}"
+            width: "58*{{界面比例}}/2"
+            height: "15*{{界面比例}}/2"
+            tooltip:
+              - '&7关闭追踪窗口'
+          任务内容:
+            type: label
+            align: "left"
+            scale: '1*{{界面比例}}'
+            texts:
+              - " &a● &f前往 &2诺兰城"
+              - " &a● &f通关 &c哥布林洞穴&8[&a简单&8] &7(&f1&7/&b3&7)"
+              - " &c■ &f按下 &eESC键 &f点击世界传送"
+            locationX: "0*{{界面比例}}"
+            locationY: "17*{{界面比例}}"
+            locationZ: "0"
+            stroke: 1
+            strokeColor: 2147483648

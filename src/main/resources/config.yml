@@ -1,0 +1,57 @@
+MySQLHost: '127.0.0.1'
+MySQLPort: '3306'
+MySQLUsername: 'root'
+MySQLPassword: '123456'
+MySQLDatabase: 'quests'
+MySQLUseSSL: false
+
+
+#HUD里任务的最大属性
+hud-quest-max: 10
+
+hud-settings:
+  #开启导航的图标
+  navigation-on-path1: ''
+  #关闭导航的图标
+  navigation-off-path1: ''
+
+gui-settings:
+  navigation-on-path1: ''
+  #关闭导航的图标
+  navigation-off-path1: ''
+
+hud-name-replace:
+  - '主线'
+
+quest-type:
+  主线任务:
+    path: ''
+    list:
+      - ''
+
+Post:
+  'worldName':
+    'toWorldName': 'loc:1,1,1'
+    'toWorldName2': 'msg:none'
+
+station:
+  'worldName':
+    '1,1,1,stationName':
+      - '2,2,2'
+
+
+Lang:
+  QuestNeedTitle: '&6&l[任务内容]'
+  QuestInfoTitle: '&6&l[任务需求]'
+  QuestRewardTitle: '&6&l[任务奖励]'
+  NotPost: '&c无法导航至别的世界！'
+  PlayerNear: '&c您已经在任务点旁边了！'
+  NoReward: "无"
+
+chem-reward:
+  text:
+    exp: "经验 %exp%"
+    money: "金币 %money%"
+
+#%qinfo_num% 任务数量
+#%qinfo_info% 任务信息
