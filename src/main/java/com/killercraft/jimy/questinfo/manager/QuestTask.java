@@ -33,7 +33,6 @@ public class   QuestTask implements Cloneable{
     public int hashCode() {
         return Objects.hashCode(questName);
     }
-
     @Getter
     @Setter
     private String questName;

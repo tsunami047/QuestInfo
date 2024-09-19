@@ -17,6 +17,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +26,8 @@ import java.util.*;
 import static com.killercraft.jimy.questinfo.QuestManager.*;
 
 public class  ConfigUtil {
+
+
 
     public static void update(){
 
@@ -68,31 +71,7 @@ public class  ConfigUtil {
             posts.put(temp,pi);
         }
 
-        List<StationTemp> stList = new ArrayList<>();
-        ConfigurationSection stationSec = config.getConfigurationSection("Station");
-        for(String temp:stationSec.getKeys(false)){
-            World world = Bukkit.getWorld(temp);
-            ConfigurationSection sec2 = stationSec.getConfigurationSection(temp);
-            for(String temp2:sec2.getKeys(false)){
-                String[] locInfo = temp2.split(",");
-                double x = Double.parseDouble(locInfo[0]);
-                double y = Double.parseDouble(locInfo[1]);
-                double z = Double.parseDouble(locInfo[2]);
-                String stationName = locInfo[3];
-                Location loc = new Location(world,x,y,z);
-                List<String> targetLoc = sec2.getStringList(temp2);
-                List<Location> postInfo = new ArrayList<>();
-                for(String target:targetLoc){
-                    String[] targetLocInfo = target.split(",");
-                    x = Double.parseDouble(targetLocInfo[0]);
-                    y = Double.parseDouble(targetLocInfo[1]);
-                    z = Double.parseDouble(targetLocInfo[2]);
-                    postInfo.add(new Location(world,x,y,z));
-                }
-                StationTemp st = new StationTemp(world,stationName,loc,postInfo);
-                stList.add(st);
-            }
-        }
+        List<StationTemp> stList = getStationTemps(config);
 
 
         QuestManager.quests = new HashMap<>();
@@ -148,81 +127,13 @@ public class  ConfigUtil {
                     qt.setNavType(navType);
                     qt.setRewardItems(rewardItems);
                     qt.setAutoNavigation(autoNav);
-                    if(!npcNav.equals("none")){
-                        ConfigUtil.debug("NPC坐标不为none，开始获取");
-                        if(npcNav.startsWith("loc:")){
-                            String[] s = npcNav.substring(4).split(",");
-                            World world = Bukkit.getWorld(s[0]);
-                            if(world != null) {
-                                double x = Double.parseDouble(s[1]);
-                                double y = Double.parseDouble(s[2]);
-                                double z = Double.parseDouble(s[3]);
-                                Location loc = new Location(world,x,y,z);
-                                qt.setNaviLoc(loc);
-                                for(StationTemp st:stList){
-                                    if(st.checkDis(loc)){
-                                        st.addId(qt.getQuestId());
-                                    }
-                                }
-                            }else{
-                                ConfigUtil.debug("未得到世界，坐标暂定为null");
-                                qt.setNaviLoc(null);
-                            }
-                        }else {
-                            Location loc = QuestUtil.getNpcLoc(npcNav);
-                            qt.setNaviLoc(loc);
-                            if(loc != null) {
-                                for (StationTemp st : stList) {
-                                    if (st.checkDis(loc)) {
-                                        st.addId(qt.getQuestId());
-                                    }
-                                }
-                            }
-                        }
-                    }else{
-                        ConfigUtil.debug("NPC坐标为无。");
-                        qt.setNaviLoc(null);
-                    }
+
+                    Location location = loadNormalNavigation(npcNav, stList);
+                    qt.setNaviLoc(location);
 
                     List<String> offNavInfo = questFile.getStringList(temp+".额外导航");
-                    qt.setOffNavMap(new HashMap<>());
-                    if(offNavInfo != null && !offNavInfo.isEmpty()){
-                        HashMap<Location, OffNavigation> offNavMap = new HashMap<>();
-                        for(String info:offNavInfo){
-                            String[] s = info.split(":");
-                            if(s[0].equals("npc")){
-                                Location loc = QuestUtil.getNpcLoc(s[1]);
-                                if(loc != null){
-                                    OffNavigation of = new OffNavigation(s[2],s[3],s[0]);
-                                    offNavMap.put(loc,of);
-                                }
-                            }else if(s[0].equals("loc")){
-                                String[] e = s[1].split(",");
-                                World world = Bukkit.getWorld(e[0]);
-                                if(world != null) {
-                                    double x = Double.parseDouble(e[1]);
-                                    double y = Double.parseDouble(e[2]);
-                                    double z = Double.parseDouble(e[3]);
-                                    Location loc = new Location(world,x,y,z);
-                                    OffNavigation of = new OffNavigation(s[2],s[3],s[0]);
-                                    offNavMap.put(loc,of);
-                                }
-                            }else if(s[0].equals("dungeon")){
-                                String[] e = s[1].split(",");
-                                World world = Bukkit.getWorld("world");
-                                if(world != null) {
-                                    double x = Double.parseDouble(e[1]);
-                                    double y = Double.parseDouble(e[2]);
-                                    double z = Double.parseDouble(e[3]);
-                                    Location loc = new Location(world,x,y,z);
-                                    OffNavigation of = new OffNavigation(s[2],s[3],s[0]);
-                                    of.setDungeon(s[4]);
-                                    offNavMap.put(loc,of);
-                                }
-                            }
-                        }
-                        qt.setOffNavMap(offNavMap);
-                    }
+                    HashMap<Location, OffNavigation> locationOffNavigationHashMap = loadExtraNavigation(offNavInfo);
+                    qt.setOffNavMap(locationOffNavigationHashMap);
 
                     QuestManager.quests.put(temp,qt);
                 }
@@ -244,35 +155,116 @@ public class  ConfigUtil {
             hoverPath = questButton.getHoverPath();
         }
         questNameReplace = config.getStringList("hud-name-replace");
-//
-//        YamlConfiguration hudyc = YamlConfiguration.loadConfiguration(new File(root, "任务面板HUD.yml"));
-//        GermGuiScreen hudscreen = GermGuiScreen.getGermGuiScreen("任务面板HUD", hudyc);
-//        GermGuiCanvas mobanPart = hudscreen.getGuiPart("模板", GermGuiCanvas.class);
-//        GermGuiScroll scroll = hudscreen.getGuiPart("任务hud列表_scroll", GermGuiScroll.class);
-//        for (int i = 0; i < hudquestmax; i++) {
-//            GermGuiCanvas clone = mobanPart.clone();
-//            clone.setEnable("%quest_hud_size%>"+i);
-//            clone.setIndexName("hud_quest_"+i+"_canvas");
-//            GermGuiTexture typetexture = clone.getGuiPart("任务类型", GermGuiTexture.class);
-//            typetexture.setPath("%quest_hud_typepath_"+i+"%");
-//            typetexture.setTooltip(Collections.singletonList("%quest_hud_typetip_" + i + "%"));
-//            GermGuiButton germGuiButton = clone.getGuiPart("导航按钮", GermGuiButton.class);
-//            germGuiButton.setIndexName("hud_quest_"+i+"_navigation_button");
-//            germGuiButton.setDefaultPath("%quest_hud_navigatingpath_"+i+"%");
-//            GermGuiLabel guiLabel = clone.getGuiPart("任务名", GermGuiLabel.class);
-//            guiLabel.setText("%quest_hud_name_"+i+"%");
-//            GermGuiLabel germGuiLabel = clone.getGuiPart("任务内容", GermGuiLabel.class);
-//            germGuiLabel.setText("%quest_hud_lore_"+i+"%");
-//            GermGuiTexture bgpart = clone.getGuiPart("背景", GermGuiTexture.class);
-//            bgpart.setPath("%quest_hud_typebgpath_"+i+"%");
-//            scroll.addGuiPart(clone);
-//        }
-//        GermHudAPI.removeHUD(hudscreen);
-//        GermHudAPI.registerHUD(hudscreen);
-//        GermHudAPI.sendRegisteredHUDToAllPlayer();
     }
 
+    private static @NotNull List<StationTemp> getStationTemps(FileConfiguration config) {
+        List<StationTemp> stList = new ArrayList<>();
+        ConfigurationSection stationSec = config.getConfigurationSection("Station");
+        for(String temp:stationSec.getKeys(false)){
+            World world = Bukkit.getWorld(temp);
+            ConfigurationSection sec2 = stationSec.getConfigurationSection(temp);
+            for(String temp2:sec2.getKeys(false)){
+                String[] locInfo = temp2.split(",");
+                double x = Double.parseDouble(locInfo[0]);
+                double y = Double.parseDouble(locInfo[1]);
+                double z = Double.parseDouble(locInfo[2]);
+                String stationName = locInfo[3];
+                Location loc = new Location(world,x,y,z);
+                List<String> targetLoc = sec2.getStringList(temp2);
+                List<Location> postInfo = new ArrayList<>();
+                for(String target:targetLoc){
+                    String[] targetLocInfo = target.split(",");
+                    x = Double.parseDouble(targetLocInfo[0]);
+                    y = Double.parseDouble(targetLocInfo[1]);
+                    z = Double.parseDouble(targetLocInfo[2]);
+                    postInfo.add(new Location(world,x,y,z));
+                }
+                StationTemp st = new StationTemp(world,stationName,loc,postInfo);
+                stList.add(st);
+            }
+        }
+        return stList;
+    }
 
+    public static Location loadNormalNavigation(String npcNav,List<StationTemp> stList) {
+        Location result = null;
+        if(!npcNav.equals("none")){
+            ConfigUtil.debug("NPC坐标不为none，开始获取");
+            if(npcNav.startsWith("loc:")){
+                String[] s = npcNav.substring(4).split(",");
+                World world = Bukkit.getWorld(s[0]);
+                if(world != null) {
+                    double x = Double.parseDouble(s[1]);
+                    double y = Double.parseDouble(s[2]);
+                    double z = Double.parseDouble(s[3]);
+                    Location loc = new Location(world,x,y,z);
+                    result = loc;
+                    for(StationTemp st: stList){
+                        if(st.checkDis(loc)){
+                            st.addId(qt.getQuestId());
+                        }
+                    }
+                }else{
+                    ConfigUtil.debug("未得到世界，坐标暂定为null");
+                    result = null;
+                }
+            }else {
+                Location loc = QuestUtil.getNpcLoc(npcNav);
+                result = loc;
+                if(loc != null) {
+                    for (StationTemp st : stList) {
+                        if (st.checkDis(loc)) {
+                            st.addId(qt.getQuestId());
+                        }
+                    }
+                }
+            }
+        }else{
+            ConfigUtil.debug("NPC坐标为无。");
+            result = null;
+        }
+        return result;
+    }
+
+    public static HashMap<Location,OffNavigation> loadExtraNavigation(List<String> offNavInfo) {
+        HashMap<Location,OffNavigation> map = new HashMap<>();
+        if(offNavInfo != null && !offNavInfo.isEmpty()){
+            for(String info: offNavInfo){
+                String[] s = info.split(":");
+                if(s[0].equals("npc")){
+                    Location loc = QuestUtil.getNpcLoc(s[1]);
+                    if(loc != null){
+                        OffNavigation of = new OffNavigation(s[2],s[3],s[0]);
+                        map.put(loc,of);
+                    }
+                }else if(s[0].equals("loc")){
+                    String[] e = s[1].split(",");
+                    World world = Bukkit.getWorld(e[0]);
+                    if(world != null) {
+                        double x = Double.parseDouble(e[1]);
+                        double y = Double.parseDouble(e[2]);
+                        double z = Double.parseDouble(e[3]);
+                        Location loc = new Location(world,x,y,z);
+                        OffNavigation of = new OffNavigation(s[2],s[3],s[0]);
+                        map.put(loc,of);
+                    }
+                }else if(s[0].equals("dungeon")){
+                    String[] e = s[1].split(",");
+                    World world = Bukkit.getWorld("world");
+                    if(world != null) {
+                        double x = Double.parseDouble(e[1]);
+                        double y = Double.parseDouble(e[2]);
+                        double z = Double.parseDouble(e[3]);
+                        Location loc = new Location(world,x,y,z);
+                        OffNavigation of = new OffNavigation(s[2],s[3],s[0]);
+                        of.setDungeon(s[4]);
+                        map.put(loc,of);
+                    }
+                }
+            }
+        }
+        return map;
+    }
 
 
     public static FileConfiguration load(File file) {
