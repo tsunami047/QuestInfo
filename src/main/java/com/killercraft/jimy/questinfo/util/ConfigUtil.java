@@ -128,7 +128,7 @@ public class  ConfigUtil {
                     qt.setRewardItems(rewardItems);
                     qt.setAutoNavigation(autoNav);
 
-                    Location location = loadNormalNavigation(npcNav, stList);
+                    Location location = loadNormalNavigation(npcNav, qt,stList);
                     qt.setNaviLoc(location);
 
                     List<String> offNavInfo = questFile.getStringList(temp+".额外导航");
@@ -186,7 +186,7 @@ public class  ConfigUtil {
         return stList;
     }
 
-    public static Location loadNormalNavigation(String npcNav,List<StationTemp> stList) {
+    public static Location loadNormalNavigation(String npcNav,QuestTask qt,List<StationTemp> stList) {
         Location result = null;
         if(!npcNav.equals("none")){
             ConfigUtil.debug("NPC坐标不为none，开始获取");
