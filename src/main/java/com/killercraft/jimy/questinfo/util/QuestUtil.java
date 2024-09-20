@@ -258,4 +258,28 @@ public class QuestUtil {
         ConfigUtil.debug("坐标存在，开始反馈");
         return location;
     }
+
+    //获取当前NPC有多少个
+    public static Location getDungeonNpcLoc(String npcName,Player player){
+        List<EntityInstance> ei = QuestManager.npcTempManager.getEntityById(npcName);
+        if (ei.isEmpty()){
+//            System.out.println("未找到副本NPC坐标");
+            return null;
+        }
+        for (EntityInstance entityInstance : ei) {
+//            System.out.println(entityInstance.getLocation());
+            Location entityInstanceLocation = entityInstance.getLocation();
+            if (entityInstanceLocation.getWorld().getName().equals(player.getWorld().getName())) {
+//                System.out.println("找到NPC坐标 "+entityInstanceLocation.getWorld().getName());
+                return entityInstanceLocation;
+            }
+        }
+        return null;
+    }
+
+
+
+
+
+
 }

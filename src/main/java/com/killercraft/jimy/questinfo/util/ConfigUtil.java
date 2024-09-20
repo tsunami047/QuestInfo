@@ -130,6 +130,7 @@ public class  ConfigUtil {
 
                     Location location = loadNormalNavigation(npcNav, qt,stList);
                     qt.setNaviLoc(location);
+                    qt.setNpcNav(npcNav);
 
                     List<String> offNavInfo = questFile.getStringList(temp+".额外导航");
                     HashMap<Location, OffNavigation> locationOffNavigationHashMap = loadExtraNavigation(offNavInfo);

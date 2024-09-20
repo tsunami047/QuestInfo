@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.killercraft.jimy.questinfo.database.DatabaseClient;
 import com.killercraft.jimy.questinfo.util.ConfigUtil;
 import com.killercraft.jimy.questinfo.util.GermUtil;
+import com.killercraft.jimy.questinfo.util.QuestUtil;
 import github.saukiya.sxitem.SXItem;
 import github.saukiya.sxitem.data.item.ItemManager;
 import io.lumine.xikage.mythicmobs.MythicMobs;
@@ -76,6 +77,9 @@ public class   QuestTask implements Cloneable{
 
     @Setter
     private boolean navigating = false;
+    @Getter
+    @Setter
+    private String npcNav;
 
 
     public QuestTask(String questId,String questName, List<String> questInfo) {
@@ -169,7 +173,18 @@ public class   QuestTask implements Cloneable{
                 if(naviLoc != null){
                     ConfigUtil.debug("导航坐标存在:"+naviLoc.toString());
                     Location playerLoc = player.getLocation();
-                    if(player.getWorld() != naviLoc.getWorld()){
+
+                    Location dungeonNpcLoc = QuestUtil.getDungeonNpcLoc(this.npcNav, player);
+                    if (dungeonNpcLoc != null){
+                        GermUtil.clearNavigating(player,this);
+                        GermUtil.addNavigating(player,this);
+                        GermUtil.sendNavigation(player,dungeonNpcLoc,this);
+//                        System.out.println("副本NPC导航坐标:"+dungeonNpcLoc);
+                        if(playerLoc.distance(dungeonNpcLoc) < 5){
+                            ConfigUtil.debug("距离不足5格 提示玩家过近！");
+                            player.sendMessage(langMap.get("PlayerNear"));
+                        }
+                    } else if(player.getWorld() != naviLoc.getWorld()){
                         String worldName = player.getWorld().getName();
                         ConfigUtil.debug("导航坐标点与玩家坐标不是同一个世界，开始尝试寻找驿站");
                         if(posts.containsKey(worldName)){
@@ -192,6 +207,7 @@ public class   QuestTask implements Cloneable{
                             ConfigUtil.debug("驿站不存在！");
                         }
                     }else{
+
                         ConfigUtil.debug("导航坐标和玩家坐标是同一个世界，开始导航");
 
                         GermUtil.clearNavigating(player,this);

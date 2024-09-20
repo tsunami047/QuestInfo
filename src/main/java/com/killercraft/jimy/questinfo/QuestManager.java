@@ -24,6 +24,7 @@ public class QuestManager {
     public static HashMap<String , PostInfo> posts = new HashMap<>();
     public static HashMap<String, String> langMap = new HashMap<>();
     public static Manager npcManager = Adyeshach.INSTANCE.api().getPublicEntityManager(ManagerType.PERSISTENT);
+    public static Manager npcTempManager = Adyeshach.INSTANCE.api().getPublicEntityManager(ManagerType.TEMPORARY);
     public static String defaultPath;
     public static String hoverPath;
     public static int hudquestmax;

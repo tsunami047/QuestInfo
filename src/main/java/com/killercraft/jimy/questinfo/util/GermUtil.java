@@ -193,6 +193,12 @@ public class GermUtil {
         if(naviLoc == null){
             return;
         }
+        Location dungeonNpcLoc = QuestUtil.getDungeonNpcLoc(qt.getNpcNav(), player);
+        if (dungeonNpcLoc != null){
+            GermPacketAPI.sendNavigate(player,"任务转动视角导航","任务转动视角导航",dungeonNpcLoc.getX(),dungeonNpcLoc.getY(),dungeonNpcLoc.getZ());
+//            System.out.println("副本NPC导航坐标:"+dungeonNpcLoc);
+            return;
+        }
         GermPacketAPI.sendNavigate(player,"任务转动视角导航","任务转动视角导航",naviLoc.getX(),naviLoc.getY(),naviLoc.getZ());
     }
 
