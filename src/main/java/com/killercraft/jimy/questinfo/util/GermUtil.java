@@ -229,8 +229,7 @@ public class GermUtil {
 
             map.put("quest_hud_idname_" + i, questTask.getQuestName());
 
-            if (questTask.getHudquestName().equals("null")) {
-                String questName = questTask.getQuestName();
+            if (questTask.getHudquestName() == null || questTask.getHudquestName().equals("null")) {
                 map.put("quest_hud_name_" + i, questTask.getQuestName());
             }else {
                 map.put("quest_hud_name_" + i, questTask.getHudquestName());
@@ -253,7 +252,7 @@ public class GermUtil {
             }
             map.put("quest_hud_name_" + i, name);
 
-            if (questTask.getHudquestinfo().isEmpty()) {
+            if (questTask.getHudquestinfo() == null || questTask.getHudquestinfo().isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String s : questTask.getNeedInfo()) {
                     stringBuilder.append(s).append("\n");

@@ -27,7 +27,7 @@ import static com.killercraft.jimy.questinfo.QuestManager.*;
 
 public class  ConfigUtil {
 
-
+    public static List<StationTemp> stList;
 
     public static void update(){
 
@@ -71,7 +71,7 @@ public class  ConfigUtil {
             posts.put(temp,pi);
         }
 
-        List<StationTemp> stList = getStationTemps(config);
+         stList = getStationTemps(config);
 
 
         QuestManager.quests = new HashMap<>();
@@ -128,7 +128,7 @@ public class  ConfigUtil {
                     qt.setRewardItems(rewardItems);
                     qt.setAutoNavigation(autoNav);
 
-                    Location location = loadNormalNavigation(npcNav, qt,stList);
+                    Location location = loadNormalNavigation(npcNav, qt);
                     qt.setNaviLoc(location);
                     qt.setNpcNav(npcNav);
 
@@ -187,9 +187,9 @@ public class  ConfigUtil {
         return stList;
     }
 
-    public static Location loadNormalNavigation(String npcNav,QuestTask qt,List<StationTemp> stList) {
+    public static Location loadNormalNavigation(String npcNav,QuestTask qt) {
         Location result = null;
-        if(!npcNav.equals("none")){
+        if(!"none".equals(npcNav)){
             ConfigUtil.debug("NPC坐标不为none，开始获取");
             if(npcNav.startsWith("loc:")){
                 String[] s = npcNav.substring(4).split(",");

@@ -9,7 +9,6 @@ depend:
   - Adyeshach
   - MythicMobs
   - AoitoriProject
-  - DailyQuest
 softdepend:
   - PlaceholderAPI
   - SX-Item
