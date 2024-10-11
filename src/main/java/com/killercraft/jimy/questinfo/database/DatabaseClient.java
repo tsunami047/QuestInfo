@@ -80,6 +80,7 @@ public class DatabaseClient {
         QuestPlayerData playerQuestData = getPlayerQuestData(player.getName());
         playerQuestData.removeQuest(questId);
         Set<QuestTask> questTasks = navigationQuests.get(player.getUniqueId());
+        if (questTasks == null) return questTasks;
         questTasks.remove(QuestManager.quests.get(questId).clone());
         return questTasks;
     }
