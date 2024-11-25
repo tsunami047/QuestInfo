@@ -249,7 +249,7 @@ public class QuestListener implements Listener {
                         }
 
                         List<String> questReward = qt.getReward();
-                        List<String> chemQuestRewardText = QuestUtil.getChemQuestRewardText(qt.getQuestId());
+                        List<String> chemQuestRewardText = QuestUtil.getChemQuestRewardText(qt);
                         allInfo.add(langMap.get("QuestRewardTitle"));
                         if (questReward.isEmpty() && chemQuestRewardText.isEmpty()){
                             allInfo.add(langMap.get("NoReward"));
@@ -409,7 +409,7 @@ public class QuestListener implements Listener {
                             }
 
                             List<String> questReward = mainQuest.getReward();
-                            List<String> chemQuestRewardText = QuestUtil.getChemQuestRewardText(mainQuest.getQuestId());
+                            List<String> chemQuestRewardText = QuestUtil.getChemQuestRewardText(mainQuest);
                             allInfo.add(langMap.get("QuestRewardTitle"));
                             if (questReward.isEmpty() && chemQuestRewardText.isEmpty()){
                                 allInfo.add(langMap.get("NoReward"));

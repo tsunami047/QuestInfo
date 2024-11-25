@@ -44,7 +44,13 @@ public class QuestUtil {
         return quests;
     }
 
-    public static List<String> getChemQuestRewardText(String id){
+    public static List<String> getChemQuestRewardText(QuestTask qt){
+
+        String id = qt.getRewardQuestId();
+        if (id == null){
+            id = qt.getQuestId();
+        }
+
         List<String> list = new ArrayList<>();
         Template questTemplate = ChemdahAPI.INSTANCE.getQuestTemplate(id);
         if (questTemplate != null) {

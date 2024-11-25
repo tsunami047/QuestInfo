@@ -80,6 +80,9 @@ public class   QuestTask implements Cloneable{
     @Getter
     @Setter
     private String npcNav;
+    @Getter
+    @Setter
+    private String rewardQuestId;
 
 
     public QuestTask(String questId,String questName, List<String> questInfo) {
@@ -173,7 +176,7 @@ public class   QuestTask implements Cloneable{
                 if(naviLoc != null){
                     ConfigUtil.debug("导航坐标存在:"+naviLoc.toString());
                     Location playerLoc = player.getLocation();
-
+//                    System.out.println("坐标:"+this.npcNav);
                     Location dungeonNpcLoc = QuestUtil.getDungeonNpcLoc(this.npcNav, player);
                     if (dungeonNpcLoc != null){
                         GermUtil.clearNavigating(player,this);

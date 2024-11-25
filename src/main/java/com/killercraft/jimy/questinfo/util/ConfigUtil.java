@@ -8,8 +8,6 @@ import com.killercraft.jimy.questinfo.manager.OffNavigation;
 import com.killercraft.jimy.questinfo.manager.PostInfo;
 import com.killercraft.jimy.questinfo.manager.QuestTask;
 import com.killercraft.jimy.questinfo.manager.StationTemp;
-import io.aoitori043.dailyquest.config.ConfigHandler;
-import io.aoitori043.dailyquest.config.mapper.ChemdahQuestMapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -76,9 +74,6 @@ public class  ConfigUtil {
 
         QuestManager.quests = new HashMap<>();
 
-        for (Map.Entry<String, ChemdahQuestMapper> entry : ConfigHandler.chemdahQuests.entrySet()) {
-        }
-
         File file = new File(root+"/quests");
 
         if(file.isDirectory()){
@@ -127,6 +122,7 @@ public class  ConfigUtil {
                     qt.setNavType(navType);
                     qt.setRewardItems(rewardItems);
                     qt.setAutoNavigation(autoNav);
+                    qt.setRewardQuestId(questFile.getString(temp+".奖励任务id",null));
 
                     Location location = loadNormalNavigation(npcNav, qt);
                     qt.setNaviLoc(location);
@@ -200,9 +196,11 @@ public class  ConfigUtil {
                     double z = Double.parseDouble(s[3]);
                     Location loc = new Location(world,x,y,z);
                     result = loc;
-                    for(StationTemp st: stList){
-                        if(st.checkDis(loc)){
-                            st.addId(qt.getQuestId());
+                    if (stList!=null) {
+                        for(StationTemp st: stList){
+                            if(st.checkDis(loc)){
+                                st.addId(qt.getQuestId());
+                            }
                         }
                     }
                 }else{

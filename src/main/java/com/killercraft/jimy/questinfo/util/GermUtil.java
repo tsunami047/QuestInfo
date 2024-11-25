@@ -82,7 +82,7 @@ public class GermUtil {
                     }
 
                     List<String> questReward = mainQuest.getReward();
-                    List<String> chemQuestRewardText = QuestUtil.getChemQuestRewardText(mainQuest.getQuestId());
+                    List<String> chemQuestRewardText = QuestUtil.getChemQuestRewardText(mainQuest);
                     allInfo.add(langMap.get("QuestRewardTitle"));
                     if (questReward.isEmpty() && chemQuestRewardText.isEmpty()){
                         allInfo.add(langMap.get("NoReward"));

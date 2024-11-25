@@ -11,6 +11,7 @@ import com.killercraft.jimy.questinfo.util.GermUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,6 +22,10 @@ public final class QuestInfo extends JavaPlugin {
 
     public static QuestInfo plugin;
 
+    @EventHandler
+    public void onPluginLoad(){
+
+    }
 
     @Override
     public void onEnable() {
