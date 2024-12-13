@@ -108,7 +108,7 @@ public class GermUtil {
                     }
                 }
                 if (itemcount < 6){
-                    List<ItemStack> chemQuestRewardItemStack = QuestUtil.getChemQuestRewardItemStack(mainQuest.getQuestId());
+                    List<ItemStack> chemQuestRewardItemStack = QuestUtil.getChemQuestRewardItemStack(mainQuest);
                     if (!chemQuestRewardItemStack.isEmpty()){
                         for (ItemStack itemStack : chemQuestRewardItemStack) {
                             if (itemcount < 6) {
