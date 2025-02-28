@@ -64,6 +64,9 @@ public final class QuestInfo extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.isOp()){
+            return false;
+        }
         if(args.length >= 1){
             switch (args[0].toLowerCase()) {
                 case "reload":
