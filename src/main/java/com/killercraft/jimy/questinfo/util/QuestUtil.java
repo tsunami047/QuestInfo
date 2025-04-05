@@ -12,8 +12,10 @@ import ink.ptms.chemdah.core.quest.Quest;
 import ink.ptms.chemdah.core.quest.Template;
 import io.aoitori043.tintensifyplus.core.TIntensifyAPI;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,6 +44,32 @@ public class QuestUtil {
         }
 
         return quests;
+    }
+
+    public static List<String> generateMapOverlayAppend(QuestTask qt){
+        List<String> result = new ArrayList<>();
+        List<String> chemQuestRewardText = getChemQuestRewardText(qt);
+        List<ItemStack> chemQuestRewardItemStack = getChemQuestRewardItemStack(qt);
+        if (chemQuestRewardText.isEmpty() && chemQuestRewardItemStack.isEmpty()){
+            return result;
+        }
+        result.add(" ");
+        result.add("完成任务最终奖励：");
+        for (String s : chemQuestRewardText) {
+            result.add(" ●§f "+s.trim());
+        }
+        for (ItemStack itemStack : chemQuestRewardItemStack) {
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                continue;
+            }
+            if (itemStack.hasItemMeta()) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                if (itemMeta.hasDisplayName()) {
+                    result.add(" ● §f"+itemMeta.getDisplayName()+" §f* "+itemStack.getAmount());
+                }
+            }
+        }
+        return result;
     }
 
     public static List<String> getChemQuestRewardText(QuestTask qt){

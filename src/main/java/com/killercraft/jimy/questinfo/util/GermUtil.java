@@ -7,6 +7,8 @@ import com.killercraft.jimy.questinfo.database.entity.QuestItem;
 import com.killercraft.jimy.questinfo.database.entity.QuestPlayerData;
 import com.killercraft.jimy.questinfo.manager.OffNavigation;
 import com.killercraft.jimy.questinfo.manager.QuestTask;
+import io.aoitori043.aoitorimapplugin.business.AoitoriMapApi;
+import io.aoitori043.aoitorimapplugin.database.MapPlayerProfile;
 import io.aoitori043.aoitoriproject.database.orm.cache.EmbeddedHashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -158,9 +160,12 @@ public class GermUtil {
     }
 
     public static void removeNavigation(Player player,QuestTask qt){
+        MapPlayerProfile playerProfile = AoitoriMapApi.getPlayerProfile(player.getName());
         GermPacketAPI.removeEffect(player,qt.getQuestName());
+        playerProfile.removeOverlayImpl(qt.getQuestId());
         for(OffNavigation of:qt.getOffNavMap().values()){
             GermPacketAPI.removeEffect(player,of.getIndex());
+            playerProfile.removeOverlayImpl(of.getIndex());
         }
     }
 
@@ -172,6 +177,8 @@ public class GermUtil {
 
     public static void removeStationNavigation(Player player,String naviName){
         GermPacketAPI.removeEffect(player,naviName);
+        MapPlayerProfile playerProfile = AoitoriMapApi.getPlayerProfile(player.getName());
+        playerProfile.removeOverlayImpl(naviName);
     }
 
     public static boolean checkNavigating(Player player,QuestTask qt){
@@ -186,6 +193,8 @@ public class GermUtil {
         List<QuestTask> qtList = navigating.getOrDefault(player,new ArrayList<>());
         qtList.add(qt);
         navigating.put(player,qtList);
+        MapPlayerProfile playerProfile = AoitoriMapApi.getPlayerProfile(player.getName());
+        playerProfile.addOverlayImpl(MapPlayerProfile.OverlayType.REFRESH_PAPI_AND_CHECK,qt.getOverlayMapper());
     }
 
     public static  void addFaceToNavigation(Player player,QuestTask qt){

@@ -72,7 +72,8 @@ public class DatabaseClient {
         QuestPlayerData playerQuestData = getPlayerQuestData(player.getName());
         playerQuestData.insertQuest(questId);
         Set<QuestTask> questTasks = navigationQuests.get(player.getUniqueId());
-        questTasks.add(QuestManager.quests.get(questId).clone());
+        QuestTask questTask = QuestManager.quests.get(questId);
+        questTasks.add(questTask.clone());
         return questTasks;
     }
 

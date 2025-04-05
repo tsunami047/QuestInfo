@@ -7,6 +7,7 @@ import com.killercraft.jimy.questinfo.util.GermUtil;
 import com.killercraft.jimy.questinfo.util.QuestUtil;
 import github.saukiya.sxitem.SXItem;
 import github.saukiya.sxitem.data.item.ItemManager;
+import io.aoitori043.aoitorimapplugin.config.mapper.OverlayMapper;
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.items.MythicItem;
@@ -241,6 +242,41 @@ public class   QuestTask implements Cloneable{
         }
 //        System.out.println("导航状态:"+isNavigating());
         GermUtil.updataquesthud(player);
+    }
+
+    public OverlayMapper getOverlayMapper() {
+        List<String> tooltip;
+        if (this.needInfo != null) {
+            tooltip = new ArrayList<>(this.needInfo);
+        }else{
+            tooltip = new ArrayList<>();
+        }
+        List<String> strings = QuestUtil.generateMapOverlayAppend(this);
+        tooltip.addAll(strings);
+        return OverlayMapper.builder()
+                .index(questId)
+                .enable("true")
+                .world(naviLoc.getWorld().getName())
+                .z(String.valueOf(naviLoc.getBlockZ()))
+                .x(String.valueOf(naviLoc.getBlockX()))
+                .width("23")
+                .height("23")
+                .labelText(this.questName)
+                .tooltip(tooltip)
+                .path(this.navType)
+                .minZoom("0")
+                .maxZoom("8")
+                .labelScale("1")
+                .labelColor("ffffff")
+                .labelBackgroundColor("000000")
+                .labelOpacity("1")
+                .labelBackgroundOpacity("0.5")
+                .labelFontShadow("true")
+                .labelMinZoom("0")
+                .labelMaxZoom("8")
+                .labelOffsetX("0")
+                .labelOffsetY("16")
+                .build();
     }
 
     public boolean isNavigating() {
